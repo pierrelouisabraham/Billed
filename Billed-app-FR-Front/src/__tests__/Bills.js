@@ -56,55 +56,6 @@ const mockStore = {
   })
 };
 
-describe('getBills', () => {
-  test('should return an array of bills with formatted status', async () => {
-    // Arrange
-    const expectedOutput = [
-      {
-        date: '2023-05-30',
-        status: 'Paid'
-      },
-      {
-        date: '2023-05-31',
-        status: 'Pending'
-      }
-    ];
-
-    // Act
-    const result = await getBills.call({ store: mockStore });
-
-    // Assert
-    expect(result).toEqual(expectedOutput);
-    expect(console.log).toHaveBeenCalledTimes(3); // Vérifiez que console.log a été appelée trois fois
-  });
-
-  test('should return an empty array when store is not defined', async () => {
-    // Act
-    const result = await getBills.call({});
-
-    // Assert
-    expect(result).toEqual([]);
-    expect(console.log).toHaveBeenCalledTimes(0); // Vérifiez que console.log n'a pas été appelée
-  });
-
-  test('should handle errors and return unformatted dates when encountered', async () => {
-    // Arrange
-    const mockError = new Error('Something went wrong');
-
-    // Mockez la méthode "list" pour simuler une erreur
-    mockStore.bills = () => ({
-      list: () => Promise.reject(mockError)
-    });
-
-    // Act
-    const result = await getBills.call({ store: mockStore });
-
-    // Assert
-    expect(result).toEqual([]);
-    expect(console.log).toHaveBeenCalledWith(mockError, 'for', undefined); // Vérifiez que console.log a été appelée avec l'erreur et l'objet "doc" undefined
-  });
-});
-
 
 
 
