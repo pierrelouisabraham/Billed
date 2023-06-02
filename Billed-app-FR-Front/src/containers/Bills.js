@@ -8,6 +8,8 @@ export default class {
     this.onNavigate = onNavigate
     this.store = store
     const buttonNewBill = document.querySelector(`button[data-testid="btn-new-bill"]`)
+    const buttonHome = document.querySelector(`div[data-testid="icon-window"]`)
+    buttonHome.addEventListener("click", () => { this.onNavigate(ROUTES_PATH['Bills'])})
     if (buttonNewBill) buttonNewBill.addEventListener('click', this.handleClickNewBill)
     const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`)
     if (iconEye) iconEye.forEach(icon => {
@@ -15,6 +17,7 @@ export default class {
     })
     new Logout({ document, localStorage, onNavigate })
   }
+  
 
   handleClickNewBill = () => {
     this.onNavigate(ROUTES_PATH['NewBill'])
@@ -36,9 +39,10 @@ export default class {
         const bills = snapshot
           .map(doc => {
             try {
+              console.log(doc.date)
               return {
                 ...doc,
-                date: formatDate(doc.date),
+                date: doc.date,
                 status: formatStatus(doc.status)
               }
             } catch(e) {

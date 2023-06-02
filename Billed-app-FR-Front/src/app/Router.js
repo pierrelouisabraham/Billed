@@ -3,7 +3,7 @@ import Login, { PREVIOUS_LOCATION } from "../containers/Login.js"
 import Bills  from "../containers/Bills.js"
 import NewBill from "../containers/NewBill.js"
 import Dashboard from "../containers/Dashboard.js"
-
+import { formatDate, formatStatus } from "../app/format.js"
 import BillsUI from "../views/BillsUI.js"
 import DashboardUI from "../views/DashboardUI.js"
 
@@ -32,7 +32,17 @@ export default () => {
       divIcon2.classList.remove('active-icon')
       const bills = new Bills({ document, onNavigate, store, localStorage  })
       bills.getBills().then(data => {
+        data =  data.sort(function(a, b) {
+           var c = new Date(a.date);
+           var d = new Date(b.date);
+           return c-d;
+       });
+
+       for(var i = 0; i < data.length; i++) {
+        data[i].date = formatDate(data[i].date)
+       }
         rootDiv.innerHTML = BillsUI({ data })
+      
         const divIcon1 = document.getElementById('layout-icon1')
         const divIcon2 = document.getElementById('layout-icon2')
         divIcon1.classList.add('active-icon')
@@ -83,7 +93,16 @@ export default () => {
       divIcon2.classList.remove('active-icon')
       const bills = new Bills({ document, onNavigate, store, localStorage  })
       bills.getBills().then(data => {
+        data =  data.sort(function(a, b) {
+          var c = new Date(a.date);
+          var d = new Date(b.date);
+          return c-d;
+      });
+             for(var i = 0; i < data.length; i++) {
+        data[i].date = formatDate(data[i].date)
+       }
         rootDiv.innerHTML = BillsUI({ data })
+       
         const divIcon1 = document.getElementById('layout-icon1')
         const divIcon2 = document.getElementById('layout-icon2')
         divIcon1.classList.add('active-icon')

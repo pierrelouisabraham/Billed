@@ -2,7 +2,7 @@ const { Bill } = require('../models');
 
 const getFileURL = (filePath) => `http://localhost:5678/${filePath}`;
 
-const isPicture = (mimeType) => ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'].includes(mimeType);
+const isPicture = (mimeType) => ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf'].includes(mimeType);
 
 const create = async (req, res) => {
   const { user } = req;
@@ -31,7 +31,7 @@ const create = async (req, res) => {
       commentary,
       status,
       commentAdmin,
-      fileName: isPicture(file.mimetype) ? file.originalname : 'null',
+      fileName:  isPicture(file.mimetype) ? file.originalname : 'null',
       filePath: isPicture(file.mimetype) ? file.path : 'null',
       amount,
     });
