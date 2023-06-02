@@ -25,20 +25,90 @@ describe("Given I am connected as an employee", () => {
       window.onNavigate(ROUTES_PATH.Bills)
       await waitFor(() => screen.getByTestId('icon-window'))
       const windowIcon = screen.getByTestId('icon-window')
-      //to-do write expect expression
-
+      if(!windowIcon.className == "active-icon") {
+        return false;
+      }
+      expect(windowIcon.className).toEqual("active-icon")
     })
     test("Then bills should be ordered from earliest to latest", () => {
-      const dateArray = [];
       document.body.innerHTML = BillsUI({ data: bills })
       const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
-      dates.forEach( date => {
-        dateArray.push(new Date(date))
-      })
-      
-      const antiChrono = (a, b) => ((a - b) ? 1 : -1)
-      const datesSorted = [dateArray].sort(antiChrono)
-      expect(dateArray).not.toBe(datesSorted)
+      const antiChrono = (a, b) => ((a < b) ? 1 : -1)
+      const datesSorted = [...dates].sort(antiChrono)
+      expect(dates).toEqual(datesSorted)
     })
   })
 })
+
+
+const mockStore = {
+  bills: () => ({
+    list: () => Promise.resolve([
+      {
+        date: '2023-05-30',
+        status: 'paid'
+      },
+      {
+        date: '2023-05-31',
+        status: 'pending'
+      }
+    ])
+  })
+};
+
+describe('getBills', () => {
+  test('should return an array of bills with formatted status', async () => {
+    // Arrange
+    const expectedOutput = [
+      {
+        date: '2023-05-30',
+        status: 'Paid'
+      },
+      {
+        date: '2023-05-31',
+        status: 'Pending'
+      }
+    ];
+
+    // Act
+    const result = await getBills.call({ store: mockStore });
+
+    // Assert
+    expect(result).toEqual(expectedOutput);
+    expect(console.log).toHaveBeenCalledTimes(3); // Vérifiez que console.log a été appelée trois fois
+  });
+
+  test('should return an empty array when store is not defined', async () => {
+    // Act
+    const result = await getBills.call({});
+
+    // Assert
+    expect(result).toEqual([]);
+    expect(console.log).toHaveBeenCalledTimes(0); // Vérifiez que console.log n'a pas été appelée
+  });
+
+  test('should handle errors and return unformatted dates when encountered', async () => {
+    // Arrange
+    const mockError = new Error('Something went wrong');
+
+    // Mockez la méthode "list" pour simuler une erreur
+    mockStore.bills = () => ({
+      list: () => Promise.reject(mockError)
+    });
+
+    // Act
+    const result = await getBills.call({ store: mockStore });
+
+    // Assert
+    expect(result).toEqual([]);
+    expect(console.log).toHaveBeenCalledWith(mockError, 'for', undefined); // Vérifiez que console.log a été appelée avec l'erreur et l'objet "doc" undefined
+  });
+});
+
+
+
+
+
+
+
+
