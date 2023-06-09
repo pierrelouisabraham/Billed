@@ -31,11 +31,12 @@ export default () => {
       divIcon1.classList.add('active-icon')
       divIcon2.classList.remove('active-icon')
       const bills = new Bills({ document, onNavigate, store, localStorage  })
-      bills.getBills().then(data => {
+      bills.getBills().then( async data => {
         data =  data.sort(function(a, b) {
+          console.log('hey')
            var c = new Date(a.date);
            var d = new Date(b.date);
-           return c-d;
+           return d-c;
        });
 
        for(var i = 0; i < data.length; i++) {
@@ -92,11 +93,11 @@ export default () => {
       divIcon1.classList.add('active-icon')
       divIcon2.classList.remove('active-icon')
       const bills = new Bills({ document, onNavigate, store, localStorage  })
-      bills.getBills().then(data => {
+      bills.getBills().then( data => {
         data =  data.sort(function(a, b) {
           var c = new Date(a.date);
           var d = new Date(b.date);
-          return c-d;
+          return d-c;
       });
              for(var i = 0; i < data.length; i++) {
         data[i].date = formatDate(data[i].date)

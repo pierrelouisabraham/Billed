@@ -5,6 +5,7 @@ import LoadingPage from "./LoadingPage.js"
 import Actions from './Actions.js'
 
 const row = (bill) => {
+  console.log(bill, bill.date)
   return (`
     <tr>
       <td>${bill.type}</td>
@@ -19,9 +20,9 @@ const row = (bill) => {
     `)
   }
 
-const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
-}
+  const rows = (data) => {
+    return (data && data.length) ? data.sort((d2, d1) => new Date(d1.date).getTime() - new Date(d2.date).getTime()).map(bill => row(bill)).join("") : ""
+  }
 
 export default ({ data: bills, loading, error }) => {
   
