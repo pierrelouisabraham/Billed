@@ -20,15 +20,16 @@ export default class NewBill {
   hasValidExtension = (extension, validExtensions = ['jpg', 'jpeg', 'png']) => validExtensions.includes(extension.toLowerCase())
 
   handleChangeFile = e => {
-    e.preventDefault()
+    e.preventDefault()  
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
-
+  
     // Check if file name contains extension valid
     const fileNameSplitted = file.name.split('.')
     const extension = fileNameSplitted[fileNameSplitted.length - 1].toLowerCase()
-
+    formData.append('file', file)
+    formData.append('email', email)
     // let regex = new RegExp(/[^\s]+(.*?).(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/);
     console.log(extension)
     console.log(this.hasValidExtension(extension))
@@ -41,9 +42,6 @@ export default class NewBill {
       alert('Extension invalide')
       this.isValidExtension = false
     }
-
-    formData.append('file', file)
-    formData.append('email', email)
     this.fileName = file.name
   }
 
@@ -67,14 +65,15 @@ export default class NewBill {
       }
       this.updateBill(bill)
       this.onNavigate(ROUTES_PATH['Bills'])
-    } else {  
+    } else {
       alert('vous ne pouvez pas soumettre tant que vous avez un fichier invalide')
     }
   }
 
   createFile = data => {
+   
     if (this.store) {
-      this.store
+      return this.store
         .bills()
         .create({
           data,
@@ -82,12 +81,15 @@ export default class NewBill {
             noContentType: true
           }
         })
-        .then(({ fileUrl, key }) => {
+        .then(({ fileUrl, key, fileName }) => {
           console.log(fileUrl, key)
           this.billId = key
           this.fileUrl = fileUrl
           this.fileName = fileName
-        }).catch(error => console.error(error))
+        }).catch(error => {
+          console.error(error)
+          throw error
+        })
     }
   }
 

@@ -1,10 +1,11 @@
 import NewBill from '../containers/NewBill.js';
 import Logout from "../containers/Logout.js"
-import { ROUTES_PATH } from '../constants/routes';
+import { ROUTES, ROUTES_PATH } from '../constants/routes';
 import { fireEvent, screen, waitFor, wait } from "@testing-library/dom"
 import { localStorageMock } from "../__mocks__/localStorage.js"
 import { mockedBills } from "../__mocks__/store.js"
 import NewBillUI from '../views/NewBillUI.js';
+import mockStore from "../__mocks__/store"
 
 const bill = {
   "id": "47qAXb6fIm2zOKkLzMro",
@@ -59,7 +60,7 @@ describe("Given I am connected as an employee", () => {
           get: inputFileGet,
           configurable: true
         })
-        jest.spyOn(window, 'alert').mockImplementation(() => {})
+        jest.spyOn(window, 'alert').mockImplementation(() => { })
       })
 
       test("with an invalid extension then an alert is displayed and no file is created", async () => {
@@ -71,7 +72,7 @@ describe("Given I am connected as an employee", () => {
         const createFile = jest.spyOn(newBill, 'createFile')
 
         fireEvent.change(inputFile)
-        
+
         expect(window.alert).toHaveBeenCalled()
         expect(createFile).not.toHaveBeenCalled()
       })
@@ -85,17 +86,13 @@ describe("Given I am connected as an employee", () => {
         const createFile = jest.spyOn(newBill, 'createFile')
 
         fireEvent.change(inputFile)
-        
+
         expect(createFile).toHaveBeenCalled()
       })
 
     })
     describe('When i submit form on newBill', () => {
-      beforeEach(async () => {
-        
-
-      })
-      test("with valid select input", async ()=> {
+      test("with valid select input", async () => {
         const selectType = screen.getByTestId('expense-type');
         selectType[2].click();
         expect(selectType[2]).toBeTruthy()
@@ -109,34 +106,38 @@ describe("Given I am connected as an employee", () => {
         const timePicker = await screen.findByTestId('datepicker');
         fireEvent.click(timePicker);
         await waitFor(() =>
-        fireEvent.change(timePicker, { target: { value: "2020-05-24" } })
-    );
+          fireEvent.change(timePicker, { target: { value: "2020-05-24" } })
+        );
         expect(timePicker.value).toBe("2020-05-24");
       })
-      test("with valid amount", async () =>{
+      test("with valid amount", async () => {
         const inputAmount = screen.getByTestId("amount")
-        fireEvent.change(inputAmount, {target: {value: bill.amount}})
-        
+        fireEvent.change(inputAmount, { target: { value: bill.amount } })
+
         expect(inputAmount.value).toBe(bill.amount)
       })
-      test("with valid vat", async () =>{
+      test("with valid vat", async () => {
         const inputVat = screen.getByTestId("vat")
-        fireEvent.change(inputVat, {target: {value: bill.vat}})
+        fireEvent.change(inputVat, { target: { value: bill.vat } })
         expect(inputVat.value).toBe(bill.vat)
       })
-      test("with valid pct", async () =>{
+      test("with valid pct", async () => {
         const inputPct = screen.getByTestId("pct")
-        fireEvent.change(inputPct, {target: {value: bill.pct}})
+        fireEvent.change(inputPct, { target: { value: bill.pct } })
         expect(inputPct.value).toBe(bill.pct)
       })
       test("with commentary", async () => {
         const inputComment = screen.getByTestId("commentary")
-        fireEvent.change(inputComment, {target: {value: bill.commentary}})
+        fireEvent.change(inputComment, { target: { value: bill.commentary } })
         expect(inputComment.value).toBe(bill.commentary)
       })
       test("with event trigger", async () => {
-        const createFile = jest.spyOn(newBill, 'createFile')
-        const submitForm = jest.spyOn(newBill, 'handleSubmit')
+        // const createFile = jest.spyOn(newBill, 'createFile')
+        // const submitForm = jest.spyOn(newBill, 'handleSubmit')
+        const onNavigate = jest.spyOn(newBill, 'onNavigate')
+        const updateBill = jest.spyOn(newBill, 'updateBill')
+
+
         const selectType = screen.getByTestId('expense-type');
         selectType[2].click();
         const inputExpense = screen.getByTestId('expense-name')
@@ -144,30 +145,74 @@ describe("Given I am connected as an employee", () => {
         const timePicker = await screen.findByTestId('datepicker');
         fireEvent.click(timePicker);
         await waitFor(() =>
-        fireEvent.change(timePicker, { target: { value: "2020-05-24" } }));
+          fireEvent.change(timePicker, { target: { value: "2020-05-24" } }));
         inputFileGet.mockReturnValue([{
           name: 'file.png',
           size: 12345,
           blob: 'some-blob'
-          }])
+        }])
         fireEvent.change(inputFile)
         const inputAmount = screen.getByTestId("amount")
-        fireEvent.change(inputAmount, {target: {value: bill.amount}})
+        fireEvent.change(inputAmount, { target: { value: bill.amount } })
         const inputVat = screen.getByTestId("vat")
-        fireEvent.change(inputVat, {target: {value: bill.vat}})
+        fireEvent.change(inputVat, { target: { value: bill.vat } })
         const inputPct = screen.getByTestId("pct")
-        fireEvent.change(inputPct, {target: {value: bill.pct}})
+        fireEvent.change(inputPct, { target: { value: bill.pct } })
         const inputComment = screen.getByTestId("commentary")
-        fireEvent.change(inputComment, {target: {value: bill.commentary}})
+        fireEvent.change(inputComment, { target: { value: bill.commentary } })
         const buttonSub = screen.getByTestId('#btn-send-bill')
         await waitFor(() =>
-        fireEvent.click(buttonSub));
-        expect(createFile).toHaveBeenCalled(),
-        expect(submitForm).toHaveBeenCalled()
-        })
+          fireEvent.click(buttonSub));
+
+        expect(updateBill).toHaveBeenCalled()
+        expect(onNavigate).toHaveBeenCalled()
 
       })
 
     })
-    
+
+    describe("Test API createFile method", () => {
+      beforeAll(() => {
+        jest.mock("../app/store", () => mockStore)
+        jest.spyOn(mockStore, "bills")
+        document.body.innerHTML = NewBillUI()
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname })
+        }
+        const store = mockStore
+        newBill = new NewBill({ 
+          document, onNavigate, store, localStorage: window.localStorage
+        })
+      })
+      test('POST data then get fileUrl and key', async () => {
+        await newBill.createFile({})
+        expect(newBill.fileUrl).toEqual('https://localhost:3456/images/test.jpg')
+        expect(newBill.billId).toEqual('1234')
+      })
+      test("POST data to API and fails with 404 message error", async () => {
+
+        mockStore.bills.mockImplementationOnce(() => {
+          return {
+            create: () => {
+              return Promise.reject(new Error("Erreur 404"))
+            }
+          }
+        })
+        await expect(newBill.createFile({})).rejects.toEqual(new Error("Erreur 404"))
+      })
+      test("POST data to API and fails with 500 message error", async () => {
+
+        mockStore.bills.mockImplementationOnce(() => {
+          return {
+            create: () => {
+              return Promise.reject(new Error("Erreur 500"))
+            }
+          }
+        })
+        await expect(newBill.createFile({})).rejects.toEqual(new Error("Erreur 500"))
+      })
+    })
+
+  })
+
 });
