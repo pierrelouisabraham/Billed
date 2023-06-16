@@ -124,18 +124,47 @@ describe("Given I am connected as an employee", () => {
         fireEvent.change(inputVat, {target: {value: bill.vat}})
         expect(inputVat.value).toBe(bill.vat)
       })
-      test("with commentary", async () => {
-        const inputComment = screen.getByTestId("commentary")
-        fireEvent.change(inputComment, {target: {value: bill.commentary}})
-        expect(inputComment.value).toBe(bill.commentary)
+      test("with valid pct", async () =>{
+        const inputPct = screen.getByTestId("pct")
+        fireEvent.change(inputPct, {target: {value: bill.pct}})
+        expect(inputPct.value).toBe(bill.pct)
       })
       test("with commentary", async () => {
         const inputComment = screen.getByTestId("commentary")
         fireEvent.change(inputComment, {target: {value: bill.commentary}})
         expect(inputComment.value).toBe(bill.commentary)
       })
+      test("with event trigger", async () => {
+        const createFile = jest.spyOn(newBill, 'createFile')
+        const submitForm = jest.spyOn(newBill, 'handleSubmit')
+        const selectType = screen.getByTestId('expense-type');
+        selectType[2].click();
+        const inputExpense = screen.getByTestId('expense-name')
+        fireEvent.change(inputExpense, { target: { value: bill.name } })
+        const timePicker = await screen.findByTestId('datepicker');
+        fireEvent.click(timePicker);
+        await waitFor(() =>
+        fireEvent.change(timePicker, { target: { value: "2020-05-24" } }));
+        inputFileGet.mockReturnValue([{
+          name: 'file.png',
+          size: 12345,
+          blob: 'some-blob'
+          }])
+        fireEvent.change(inputFile)
+        const inputAmount = screen.getByTestId("amount")
+        fireEvent.change(inputAmount, {target: {value: bill.amount}})
+        const inputVat = screen.getByTestId("vat")
+        fireEvent.change(inputVat, {target: {value: bill.vat}})
+        const inputPct = screen.getByTestId("pct")
+        fireEvent.change(inputPct, {target: {value: bill.pct}})
+        const inputComment = screen.getByTestId("commentary")
+        fireEvent.change(inputComment, {target: {value: bill.commentary}})
+        expect(createFile).toHaveBeenCalled(),
+        expect(submitForm).toHaveBeenCalled()
+        })
+
+      })
+
     })
-    test("with ")
-     
-  })
+    
 });
