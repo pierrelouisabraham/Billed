@@ -159,6 +159,9 @@ describe("Given I am connected as an employee", () => {
         fireEvent.change(inputPct, {target: {value: bill.pct}})
         const inputComment = screen.getByTestId("commentary")
         fireEvent.change(inputComment, {target: {value: bill.commentary}})
+        const buttonSub = screen.getByTestId('#btn-send-bill')
+        await waitFor(() =>
+        fireEvent.click(buttonSub));
         expect(createFile).toHaveBeenCalled(),
         expect(submitForm).toHaveBeenCalled()
         })

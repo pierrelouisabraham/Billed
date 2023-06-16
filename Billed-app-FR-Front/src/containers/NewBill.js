@@ -49,6 +49,7 @@ export default class NewBill {
 
   handleSubmit = e => {
     e.preventDefault()
+    console.log(e)
     if (this.isValidExtension) {
       const email = JSON.parse(localStorage.getItem("user")).email
       const bill = {
