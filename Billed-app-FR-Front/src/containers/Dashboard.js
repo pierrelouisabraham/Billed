@@ -55,7 +55,6 @@ export const card = (bill) => {
 }
 
 export const cards = (bills) => {
-  console.log('here')
   return bills && bills.length ? bills.map(bill => card(bill)).join("") : ""
 }
 
@@ -138,7 +137,6 @@ export default class {
     if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
     if (this.counter % 2 === 0) {
-      console.log("here" + this.counter, e)
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
       $(`#status-bills-container${this.index}`)
         .html(cards(filteredBills(bills, getStatus(this.index))))

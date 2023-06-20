@@ -30,15 +30,10 @@ export default class NewBill {
     const extension = fileNameSplitted[fileNameSplitted.length - 1].toLowerCase()
     formData.append('file', file)
     formData.append('email', email)
-    // let regex = new RegExp(/[^\s]+(.*?).(jpg|jpeg|png|gif|JPG|JPEG|PNG|GIF)$/);
-    console.log(extension)
-    console.log(this.hasValidExtension(extension))
     if (this.hasValidExtension(extension)) {
       this.isValidExtension = true
       this.createFile(formData)
-      console.log('extension valide')
     } else {
-      console.log('extension invalide')
       alert('Extension invalide')
       this.isValidExtension = false
     }
@@ -47,7 +42,6 @@ export default class NewBill {
 
   handleSubmit = e => {
     e.preventDefault()
-    console.log(e)
     if (this.isValidExtension) {
       const email = JSON.parse(localStorage.getItem("user")).email
       const bill = {
@@ -82,7 +76,6 @@ export default class NewBill {
           }
         })
         .then(({ fileUrl, key, fileName }) => {
-          console.log(fileUrl, key)
           this.billId = key
           this.fileUrl = fileUrl
           this.fileName = fileName
